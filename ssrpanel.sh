@@ -4,22 +4,10 @@
 #GitHub版
 [ $(id -u) != "0" ] && { echo "Error: You must be root to run this script"; exit 1; }
 function install_ssrpanel(){
-	yum -y remove httpd
-	yum install -y unzip zip git
-	#自动选择下载节点
-	GIT='raw.githubusercontent.com'
-	MY='gitee.com'
-	GIT_PING=`ping -c 1 -w 1 $GIT|grep time=|awk '{print $7}'|sed "s/time=//"`
-	MY_PING=`ping -c 1 -w 1 $MY|grep time=|awk '{print $7}'|sed "s/time=//"`
-	echo "$GIT_PING $GIT" > ping.pl
-	echo "$MY_PING $MY" >> ping.pl
-	fileinfo=`sort -V ping.pl|sed -n '1p'|awk '{print $2}'`
-	if [ "$fileinfo" == "$GIT" ];then
-		fileinfo='https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/fileinfo.zip'
-	else
-		fileinfo='https://gitee.com/marisn/ssrpanel-new/raw/master/fileinfo.zip'
-	fi
-	rm -f ping.pl	
+	apt-get -y remove httpd
+	apt-get install -y unzip zip git
+	
+	fileinfo='https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/fileinfo.zip'
 	 wget -c --no-check-certificate https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/lnmp1.4.zip && unzip lnmp1.4.zip && rm -rf lnmp1.4.zip && cd lnmp1.4 && chmod +x install.sh && ./install.sh
 	clear
 	#安装fileinfo必须组件
@@ -38,7 +26,7 @@ function install_ssrpanel(){
 	git clone https://github.com/ssrpanel/ssrpanel.git tmp && mv tmp/.git . && rm -rf tmp && git reset --hard
 	#替换数据库配置
 	#??? Database root password a
-	wget -N -P /home/wwwroot/default/config/ https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/app.php
+	#wget -N -P /home/wwwroot/default/config/ https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/app.php
 	wget -N -P /home/wwwroot/default/config/ https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/database.php
 	wget -N -P /usr/local/php/etc/ https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/php.ini
 	wget -N -P /usr/local/nginx/conf/ https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/nginx.conf
@@ -73,7 +61,7 @@ EOF
 	service nginx restart
     service php-fpm restart
 	#开启日志监控
-	yum -y install vixie-cron crontabs
+	apt-get -y install vixie-cron crontabs
 	rm -rf /var/spool/cron/root
 	echo '* * * * * php /home/wwwroot/default/artisan schedule:run >> /dev/null 2>&1' >> /var/spool/cron/root
 	service crond restart
@@ -146,10 +134,10 @@ EOF
 
 }
 function install_ssr(){
-	yum -y update
-	yum -y install git 
-	yum -y install python-setuptools && easy_install pip 
-	yum -y groupinstall "Development Tools" 
+	apt-get update
+	apt-get install git 
+	apt-get install python-setuptools && easy_install pip 
+	apt-get groupinstall "Development Tools" 
 	#512M chicks add 1 g of Swap
 	dd if=/dev/zero of=/var/swap bs=1024 count=1048576
 	mkswap /var/swap
@@ -175,7 +163,7 @@ function install_ssr(){
 	./configure && make -j2 && make install
 	echo /usr/local/lib > /etc/ld.so.conf.d/usr_local_lib.conf
 	ldconfig
-	yum -y install python-setuptools
+	apt-get install python-setuptools
 	easy_install supervisor
     cd /root
 	wget https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/ssr-3.4.0.zip
@@ -192,14 +180,16 @@ function install_ssr(){
 	sed -i "s#Dbpassword#${Dbpassword}#" /root/shadowsocksr/usermysql.json
 	sed -i "s#Dbname#${Dbname}#" /root/shadowsocksr/usermysql.json
 	sed -i "s#UserNODE_ID#${UserNODE_ID}#" /root/shadowsocksr/usermysql.json
-	yum -y install lsof lrzsz
-	yum -y install python-devel
-	yum -y install libffi-devel
-	yum -y install openssl-devel
-	yum -y install iptables
+	apt-get install lsof lrzsz
+	apt-get install python-devel
+	apt-get install libffi-devel
+	apt-get install openssl-devel
+	apt-get install iptables
 	systemctl stop firewalld.service
 	systemctl disable firewalld.service
 }
+
+
 function install_node(){
 	clear
 	echo
@@ -263,23 +253,20 @@ function install_RS(){
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 ulimit -c 0
-rm -rf ssrpanel*
 clear
 echo
 Realip=`curl -s ipinfo.io/ip`;
-
 echo -e "Your IP address is: $Realip "
-clear
+
 echo "#############################################################################"
 echo "#Welcome to use One click Install ssrpanel and nodes scripts                #"
 echo "#Please select the script you want to build：                               #"
 echo "#1.  One click Install ssrpanel                                             #"
-echo "#2.  One click Install ssrpanel nodes                                       #"
+#echo "#2.  One click Install ssrpanel nodes                                       #"
 echo "#3.  One click Install BBR                                                  #"
 echo "#4.  One click Install Serverspeeder                                        #"
 echo "#5.  Upgrade to the latest ssr-panel [official update script]               #"
-echo "#6.  Log analysis (currently only single node single node support)          #" 
-echo "#7.  One click change the Database password                                 #" 
+echo "#6.  One click change the Database password                                 #" 
 echo "#                      PS:Please build acceleration and build ssrpanel first#"
 echo "#                                     Apply to Centos 7. X system           #"
 echo "#############################################################################"
@@ -289,10 +276,10 @@ if [[ $num == "1" ]]
 then
 install_ssrpanel
 fi;
-if [[ $num == "2" ]]
-then
-install_node
-fi;
+#if [[ $num == "2" ]]
+#then
+#install_node
+#fi;
 if [[ $num == "3" ]]
 then
 install_BBR
@@ -307,10 +294,6 @@ cd /home/wwwroot/default/
 chmod a+x update.sh && sh update.sh
 fi;
 if [[ $num == "6" ]]
-then
-install_log
-fi;
-if [[ $num == "7" ]]
 then
 change_password
 fi;
