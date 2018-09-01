@@ -38,7 +38,6 @@ function install_ssrpanel(){
 	git clone https://github.com/ssrpanel/ssrpanel.git tmp && mv tmp/.git . && rm -rf tmp && git reset --hard
 	#替换数据库配置
 	#??? Database root password a
-	wget -N -P /home/wwwroot/default/config/ https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/app.php
 	wget -N -P /home/wwwroot/default/config/ https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/database.php
 	wget -N -P /usr/local/php/etc/ https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/php.ini
 	wget -N -P /usr/local/nginx/conf/ https://raw.githubusercontent.com/JMVoid/ssrpanel-oneclick-install-centos7/master/nginx.conf
@@ -263,13 +262,12 @@ function install_RS(){
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 ulimit -c 0
-rm -rf ssrpanel*
-clear
+
 echo
 Realip=`curl -s ipinfo.io/ip`;
 
 echo -e "Your IP address is: $Realip "
-clear
+
 echo "#############################################################################"
 echo "#Welcome to use One click Install ssrpanel and nodes scripts                #"
 echo "#Please select the script you want to build：                               #"
